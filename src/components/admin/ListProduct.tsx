@@ -1,4 +1,19 @@
+import { useEffect, useState } from "react";
+import instanceAxios from "../../ultis/configAxios";
+import { IProduct } from "../../types/product";
+
 const ListProduct = () => {
+  const [products, setProducts] = useState<IProduct[]>([]);
+
+
+  useEffect(() => {
+    const getProducts = async () => {
+      const response = await instanceAxios.get("/products");
+      setProducts(response.data);
+    };
+    getProducts();
+  }, []);
+
   return (
     <div>
       <div className="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
@@ -31,9 +46,9 @@ const ListProduct = () => {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       ></path>
                     </svg>
                     <span
@@ -76,9 +91,9 @@ const ListProduct = () => {
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   ></path>
                 </svg>
                 Add product
@@ -87,20 +102,17 @@ const ListProduct = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 my-4 2xl:grid-cols-2 xl:gap-4">
+      <div className="grid grid-cols-1 my-4 xl:gap-4">
         <div className="h-full p-4 mb-4 bg-white rounded-lg shadow sm:p-6">
           <div className="relative overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 rtl:text-right dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-6 py-3">
-                    Product name
+                    Name
                   </th>
                   <th scope="col" className="px-6 py-3">
-                    Color
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Category
+                    Product-Code
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Price
@@ -111,63 +123,28 @@ const ListProduct = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Apple MacBook Pro 17"
-                  </th>
-                  <td className="px-6 py-4">Silver</td>
-                  <td className="px-6 py-4">Laptop</td>
-                  <td className="px-6 py-4">$2999</td>
-                  <td>
-                    <button className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105">
-                      Edit
-                    </button>
-                    <button className="px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-lg hover:bg-red-700 hover:scale-105">
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-                <tr className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Microsoft Surface Pro
-                  </th>
-                  <td className="px-6 py-4">White</td>
-                  <td className="px-6 py-4">Laptop PC</td>
-                  <td className="px-6 py-4">$1999</td>
-                  <td>
-                    <button className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105">
-                      Edit
-                    </button>
-                    <button className="px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-lg hover:bg-red-700 hover:scale-105">
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
-                <tr className="bg-white dark:bg-gray-800">
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
-                    Magic Mouse 2
-                  </th>
-                  <td className="px-6 py-4">Black</td>
-                  <td className="px-6 py-4">Accessories</td>
-                  <td className="px-6 py-4">$99</td>
-                  <td>
-                    <button className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105">
-                      Edit
-                    </button>
-                    <button className="px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-lg hover:bg-red-700 hover:scale-105">
-                      Xóa
-                    </button>
-                  </td>
-                </tr>
+                {products.map((product) => (
+                  <tr key={product.id} className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {product.name}
+                    </th>
+                    <td className="px-6 py-4">{product.productCode}</td>
+                    <td className="px-6 py-4">{product.price}</td>
+                    <td>
+                      <button className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105">
+                        Edit
+                      </button>
+                      <button className="px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-lg hover:bg-red-700 hover:scale-105">
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+
+
               </tbody>
             </table>
           </div>
