@@ -5,10 +5,11 @@ import Header from "../components/Header";
 const ClientLayout = () => {
   return (
     <>
-      <Header/>
+      <Header />
       <div>
         <Outlet />
       </div>
+
     </>
   );
 };

@@ -1,10 +1,24 @@
 import { useEffect, useState } from "react";
 import { IProduct } from "../../types/product";
 import { productServices } from "../../services/Product";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const ProductSchema = z.object({
+  name: z.string().min(1, "Name is required").max(255, "Name is too long"),
+  description: z.string().min(1, "Description is required"),
+  productCode: z.string().min(1, "Product code is required"),
+  price: z.number().min(0, "Price must be a positive number"),
+  image: z.string().url("Image must be a valid URL"),
+});
 
 const ListProduct = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
+  const { register, handleSubmit } = useForm<IProduct>({
+    resolver: zodResolver(ProductSchema),
+  });
 
   const handleShowModal = () => {
     setIsShowModal(true);
@@ -18,9 +32,15 @@ const ListProduct = () => {
     if (!isConfirm) return;
     const data = await productServices.deleteProduct(id);
     if (data) {
+      toast.success("Successfully created!");
       setProducts(products.filter((product) => product.id !== id));
     }
     // if (data) fetchProducts();
+  };
+
+  const onSubmit = async (data) => {
+    console.log(data);
+
   };
 
   const fetchProducts = async () => {
@@ -98,7 +118,7 @@ const ListProduct = () => {
             </form>
             <div className="flex items-center w-full sm:justify-end">
               <button
-                onClick={handleShowModal}
+                onClick={() => handleShowModal()}
                 type="button"
                 data-modal-toggle="add-product-modal"
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-cyan-600 hover:bg-cyan-700 focus:ring-4 focus:ring-cyan-200 sm:ml-auto"
@@ -156,11 +176,14 @@ const ListProduct = () => {
                     <td className="px-6 py-4">{product.productCode}</td>
                     <td className="px-6 py-4">{product.price}</td>
                     <td>
-                      <button className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105">
+                      <button
+                        onClick={handleShowModal}
+                        className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105"
+                      >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDelete(product.id!)}
                         className="px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-red-500 rounded-lg hover:bg-red-700 hover:scale-105"
                       >
                         Xóa
@@ -178,10 +201,13 @@ const ListProduct = () => {
       {isShowModal && (
         <>
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="w-11/12 p-6 bg-white rounded-lg shadow-lg md:w-1/2 lg:w-1/3">
+            <div className="w-11/12 p-6 bg-white rounded-lg shadow-lg md:w-1/2 lg:w-1/2">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Thêm sản phẩm</h2>
-                <button onClick={handleHideModal} className="text-gray-500 hover:text-gray-700">
+                <h2 className="text-xl font-bold">Thêm mới sản phẩm</h2>
+                <button
+                  onClick={handleHideModal}
+                  className="text-gray-500 hover:text-gray-700"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="w-6 h-6"
@@ -199,29 +225,60 @@ const ListProduct = () => {
                 </button>
               </div>
 
-              <form>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    Tên sản phẩm
+                    Name
                   </label>
                   <input
+                    {...register("name")}
                     type="text"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Nhập tên sản phẩm"
                   />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    Giá sản phẩm
+                    Description
                   </label>
                   <input
+                    {...register("description")}
+                    type="text"
+                    className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Product Code
+                  </label>
+                  <input
+                    {...register("productCode")}
+                    type="text"
+                    className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Price
+                  </label>
+                  <input
+                    {...register("price", { valueAsNumber: true })}
                     type="number"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Nhập giá sản phẩm"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Image
+                  </label>
+                  <input
+                    type="text"
+                    {...register("image")}
+                    className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div className="flex justify-end">
                   <button
+                    onClick={handleHideModal}
                     type="button"
                     className="px-4 py-2 mr-2 font-bold text-white bg-gray-500 rounded-lg hover:bg-gray-700"
                   >
