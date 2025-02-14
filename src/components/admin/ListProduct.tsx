@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { IProduct } from "../../types/product";
 import { productServices } from "../../services/Product";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
 
 const ProductSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
@@ -16,15 +17,33 @@ const ProductSchema = z.object({
 const ListProduct = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [isShowModal, setIsShowModal] = useState<boolean>(false);
-  const { register, handleSubmit } = useForm<IProduct>({
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<IProduct>({
     resolver: zodResolver(ProductSchema),
   });
 
-  const handleShowModal = () => {
+  const handleShowModal = (product?: IProduct | null) => {
     setIsShowModal(true);
+    if (!product) {
+      setSelectedProduct(null);
+      return;
+    }
+    setSelectedProduct(product);
+    setValue("name", product.name);
+    setValue("description", product.description);
+    setValue("productCode", product.productCode);
+    setValue("price", product.price);
+    setValue("image", product.image);
   };
   const handleHideModal = () => {
     setIsShowModal(false);
+    reset();
   };
 
   const handleDelete = async (id: number) => {
@@ -32,15 +51,22 @@ const ListProduct = () => {
     if (!isConfirm) return;
     const data = await productServices.deleteProduct(id);
     if (data) {
-      toast.success("Successfully created!");
+      toast.success("delete product success");
       setProducts(products.filter((product) => product.id !== id));
+      return;
     }
-    // if (data) fetchProducts();
+    toast.error("delete product fail");
   };
 
-  const onSubmit = async (data) => {
-    console.log(data);
-
+  const onSubmit: SubmitHandler<IProduct> = async (data) => {
+    const addProductResponse = await productServices.addProduct(data);
+    handleHideModal();
+    if (!addProductResponse) {
+      toast.error("add product fail");
+      return;
+    }
+    toast.success("add product success");
+    setProducts([...products, addProductResponse]);
   };
 
   const fetchProducts = async () => {
@@ -177,7 +203,7 @@ const ListProduct = () => {
                     <td className="px-6 py-4">{product.price}</td>
                     <td>
                       <button
-                        onClick={handleShowModal}
+                        onClick={() => handleShowModal(product)}
                         className="inline-flex items-center px-4 py-2 font-bold text-white transition duration-300 ease-in-out transform bg-blue-500 rounded-lg hover:bg-blue-700 hover:scale-105"
                       >
                         Edit
@@ -203,7 +229,9 @@ const ListProduct = () => {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="w-11/12 p-6 bg-white rounded-lg shadow-lg md:w-1/2 lg:w-1/2">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Thêm mới sản phẩm</h2>
+                <h2 className="text-xl font-bold">
+                  {selectedProduct ? "Edit" : "Add mới"} sản phẩm
+                </h2>
                 <button
                   onClick={handleHideModal}
                   className="text-gray-500 hover:text-gray-700"
@@ -235,6 +263,9 @@ const ListProduct = () => {
                     type="text"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
+                  {errors.name && (
+                    <span className="text-red-500">{errors.name.message}</span>
+                  )}
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
@@ -245,6 +276,11 @@ const ListProduct = () => {
                     type="text"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
+                  {errors.description && (
+                    <span className="text-red-500">
+                      {errors.description.message}
+                    </span>
+                  )}
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
@@ -255,6 +291,11 @@ const ListProduct = () => {
                     type="text"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
+                  {errors.productCode && (
+                    <span className="text-red-500">
+                      {errors.productCode.message}
+                    </span>
+                  )}
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
@@ -265,6 +306,9 @@ const ListProduct = () => {
                     type="number"
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
+                  {errors.price && (
+                    <span className="text-red-500">{errors.price.message}</span>
+                  )}
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">
@@ -275,6 +319,9 @@ const ListProduct = () => {
                     {...register("image")}
                     className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
+                  {errors.image && (
+                    <span className="text-red-500">{errors.image.message}</span>
+                  )}
                 </div>
                 <div className="flex justify-end">
                   <button

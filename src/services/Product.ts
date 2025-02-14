@@ -10,6 +10,15 @@ const getAllProduct = async (): Promise<IProduct[] | void> => {
     }
 }
 
+const addProduct = async (product: Omit<IProduct, "id">) => {
+    try {
+        const { data } = await instanceAxios.post<IProduct>("/products", product);
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const deleteProduct = async (id: number) => {
     try {
         const { data } = await instanceAxios.delete(`/products/${id}`);
@@ -21,5 +30,6 @@ const deleteProduct = async (id: number) => {
 
 export const productServices = {
     getAllProduct,
+    addProduct,
     deleteProduct
 }
