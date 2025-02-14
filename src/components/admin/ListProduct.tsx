@@ -59,14 +59,38 @@ const ListProduct = () => {
   };
 
   const onSubmit: SubmitHandler<IProduct> = async (data) => {
-    const addProductResponse = await productServices.addProduct(data);
-    handleHideModal();
-    if (!addProductResponse) {
-      toast.error("add product fail");
-      return;
+    if (selectedProduct) {
+      console.log(data);
+
+      const editProductResponse = await productServices.updateProduct(
+        selectedProduct.id,
+        data
+      );
+      if (!editProductResponse) {
+        toast.error("edit product fail");
+        return;
+      }
+      toast.success("edit product success");
+      // setProducts(
+      //   products.map((product) => {
+      //     if (product.id === editProductResponse.id) {
+      //       return editProductResponse;
+      //     }
+      //   })
+      // );
+      fetchProducts();
+    } else {
+      const addProductResponse = await productServices.addProduct(data);
+      handleHideModal();
+      if (!addProductResponse) {
+        toast.error("add product fail");
+        return;
+      }
+      toast.success("add product success");
+      // setProducts([...products, addProductResponse]);
+      fetchProducts();
     }
-    toast.success("add product success");
-    setProducts([...products, addProductResponse]);
+    handleHideModal();
   };
 
   const fetchProducts = async () => {
@@ -214,6 +238,9 @@ const ListProduct = () => {
                       >
                         Xóa
                       </button>
+                      <button className="inline-flex items-center px-4 py-2 ml-2 font-bold text-white transition duration-300 ease-in-out transform bg-green-500 rounded-lg hover:bg-green-700 hover:scale-105">
+                        Detail
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -343,6 +370,36 @@ const ListProduct = () => {
           </div>
         </>
       )}
+
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="w-11/12 p-6 bg-white rounded-lg shadow-lg md:w-1/2 lg:w-1/2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold">Detail sản phẩm</h2>
+            <button
+              onClick={handleHideModal}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div>
+            {/* Thông tin */}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
