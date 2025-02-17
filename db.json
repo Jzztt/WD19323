@@ -26,11 +26,5 @@
     }
   ],
   "users": [
-    {
-      "email": "newuser@example.com",
-      "password": "$2a$10$6TJoFPEWLYVMgTVto.xAbOS6IT9naR45eD6LQ96ILcPv9u0rbu1aa",
-      "role": "user",
-      "id": 1
-    }
   ]
 }

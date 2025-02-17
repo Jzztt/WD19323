@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "json-server": "json-server --watch db.json --port 3000",
     "json-server-auth": "json-server db.json -m ./node_modules/json-server-auth --port 3000",
+    "server": "node server.js",
+    "json-server": "json-server --watch db.json --port 3000",
     "start": "concurrently \"npm run dev\" \"npm run json-server-auth\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
