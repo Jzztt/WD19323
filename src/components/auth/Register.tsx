@@ -1,8 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { z } from "zod";
+import { authServices } from "../../services/auth";
+import toast, { Toaster } from "react-hot-toast";
 
 const RegisterSchema = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
@@ -12,7 +14,7 @@ const RegisterSchema = z.object({
     .min(6, "Password must be at least 6 characters")
     .max(255, "Password is too long"),
 });
-type RegisterSchemaType = z.infer<typeof RegisterSchema>;
+export type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const Register = () => {
   const {
@@ -22,8 +24,15 @@ const Register = () => {
   } = useForm<RegisterSchemaType>({
     resolver: zodResolver(RegisterSchema),
   });
-  const handleRegister = (data) => {
-    console.log(data);
+  const navigate = useNavigate();
+  const handleRegister = async (data:RegisterSchemaType) => {
+    const registerResponse = await authServices.register(data);
+    if(!registerResponse){
+      toast.error("register fail");
+      return;
+    }
+    toast.success("register success");
+    navigate("/login");
   };
 
   return (
@@ -94,6 +103,9 @@ const Register = () => {
             </Link>
           </p>
         </div>
+      </div>
+      <div>
+        <Toaster/>
       </div>
     </div>
   );
