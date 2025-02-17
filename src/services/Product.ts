@@ -28,6 +28,15 @@ const updateProduct = async (id:number,product: IProduct) => {
     }
 }
 
+const getProductById = async (id: number) => {
+    try {
+        const { data } = await instanceAxios.get<IProduct>(`/products/${id}`);
+        return data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const deleteProduct = async (id: number) => {
     try {
         const { data } = await instanceAxios.delete<IProduct>(`/products/${id}`);
@@ -40,6 +49,7 @@ const deleteProduct = async (id: number) => {
 export const productServices = {
     getAllProduct,
     addProduct,
+    getProductById,
     updateProduct,
     deleteProduct
 }
