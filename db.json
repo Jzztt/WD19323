@@ -15,14 +15,6 @@
       "productCode": "Iphone-1",
       "price": 2000,
       "image": "https://flowbite.com/docs/images/blog/image-1.jpg"
-    },
-    {
-      "name": "nokia",
-      "description": "Apple Trade In.Nhận 1.000.000đ–22.200.000đ điểm tín dụng để sử dụng khi mua iPhone mới.",
-      "productCode": "nokia-1",
-      "price": 1000,
-      "image": "https://flowbite.com/docs/images/blog/image-1.jpg",
-      "id": 4
     }
   ],
   "users": [
